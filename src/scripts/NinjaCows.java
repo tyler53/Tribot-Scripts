@@ -25,6 +25,7 @@ import java.util.Random;
 /**
  * Created by Tyler53 on 8/2/2014.
  * Ninja Cows kills cows in the Lumbridge Cow Pen.
+ * THIS SCRIPT IS A WORK IN PROGRESS ~~~ IT IS NOT COMPLETED YET
  */
 
 @ScriptManifest(authors = {"Tyler53"}, name = "Ninja Cows", category = "Combat")

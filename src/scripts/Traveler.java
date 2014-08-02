@@ -2,6 +2,7 @@ package scripts;
 
 import org.tribot.api.General;
 import org.tribot.api.input.Mouse;
+import org.tribot.api2007.Login;
 import org.tribot.api2007.WebWalking;
 import org.tribot.api2007.Player;
 import org.tribot.api2007.types.RSTile;
@@ -76,6 +77,7 @@ public class Traveler extends Script implements Painting, MouseActions, ActionLi
         System.out.println("Beginning Script");
         startScript();
 
+        while(Login.getLoginState() != Login.getLoginState().INGAME){System.out.println("Waiting for Login.");sleep(1000);}
         while (loop()){General.sleep(200);}
         while(finishLoop()){General.sleep(200);}
     }
