@@ -393,7 +393,6 @@ public class NinjaCows extends Script implements ActionListener, Painting, Mouse
 
     /**
      * Handles GUI interaction with components in the "Setup" window.
-     * @param e
      */
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -459,7 +458,6 @@ public class NinjaCows extends Script implements ActionListener, Painting, Mouse
     /**
      * Paint method
      * Displays our image for the paint, and displays time ran and current status
-     * @param g
      */
     @Override
     public void onPaint(Graphics g) {
@@ -490,11 +488,8 @@ public class NinjaCows extends Script implements ActionListener, Painting, Mouse
     private static final Rectangle Toggle_Paint = new Rectangle(470, 330, 20, 20);
 
     /**
-     * Checks for a click inside the Rectangle "Toggle_Paint.
+     * Checks for a click inside the Rectangle "Toggle_Paint".
      * If paint is currently set to show, this method will hide the paint, and vice versa.
-     * @param point
-     * @param i
-     * @param b
      */
     public void mouseClicked(Point point, int i, boolean b) {
         if (Toggle_Paint.contains(point.getLocation())){
