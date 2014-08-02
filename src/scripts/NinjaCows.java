@@ -86,22 +86,11 @@ public class NinjaCows extends Script implements ActionListener, Painting, Mouse
 
         randomGenerator = new Random();
 
-        /*if (!isRunning)
-            isRunning = true;*/
-
         statusString = "Waiting For Setup";
         startSettings();
 
         while (!hasFinishedSettings){System.out.println("Waiting for Settings.");sleep(1000);}
         while (loop()){General.sleep(200);}
-
-        /*while(isRunning){
-            while(!hasFinishedSettings){System.out.println("Waiting for settings");sleep(1000);}
-            if (hasFinishedSettings) {
-                loop();
-                General.sleep(100);
-            }
-        }*/
 
     }
 
@@ -155,6 +144,11 @@ public class NinjaCows extends Script implements ActionListener, Painting, Mouse
         General.sleep(2000, 3000);
     }
 
+    /**
+     * Finds nearest cow to attack, implements null checking, tests if that cow is in combat.
+     * If that cow is in combat, it null checks and combat checks the next closest cow.
+     * When it finds a suitable cow, we run attackCow() to actually click on it.
+     */
     private void killCows() {
         General.println("Finding nearest cow to attack.");
         RSNPC[] cowsToFight = NPCs.findNearest(COW_ID);
@@ -168,6 +162,14 @@ public class NinjaCows extends Script implements ActionListener, Painting, Mouse
             }
         }
     }
+
+    /**
+     * Clicks "Attack" on the cow given by killCows(), then waits for half a second.
+     * If the character is not yet fighting the cow, we click it again (because it was probably a mis-click)
+     *
+     * @param cowToAttack
+     * which RSNPC we should attack (given by killCows())
+     */
     private void attackCow(RSNPC cowToAttack){
         statusString = "Attacking Cow";
         General.println("Attacking Cow...");
@@ -185,6 +187,16 @@ public class NinjaCows extends Script implements ActionListener, Painting, Mouse
         }
     }
 
+    /**
+     * Eats food with a given ID.
+     * If we are out of food, we call ranOutOfFood() to handle this.
+     *
+     * @param id
+     * ID for food that we will be clicking on
+     *
+     * @return
+     * true if there were no problems, and if we either ate food, or recognized that we need to bank.
+     */
     public boolean eatFood(int id){
         if (GameTab.getOpen() != GameTab.TABS.INVENTORY)
             GameTab.open(GameTab.TABS.INVENTORY);
@@ -204,6 +216,13 @@ public class NinjaCows extends Script implements ActionListener, Painting, Mouse
         return true;
     }
 
+    /**
+     * Handles banking for when we run out of food.
+     * Walks to the Lumbridge bank, and then calls bankForItems() to handle banking.
+     *
+     * @return
+     * true if there were no errors and we can go back to cows
+     */
     public boolean ranOutOfFood(){
         statusString = "Out of Food";
         General.println("Inventory has no food, banking");
@@ -226,6 +245,20 @@ public class NinjaCows extends Script implements ActionListener, Painting, Mouse
         }
     }
 
+    /**
+     * Banks for the given item.
+     * Deposits all items first to handle items accidentally picked up, or items received from randoms,
+     * then continues to withdraw the given amount for the item (food).
+     *
+     * @param id
+     * ID for food item to withdraw
+     * @param amt
+     * Amount of food items to withdraw
+     *
+     * @return
+     * true if banking was successful and we have food in the inventory, otherwise returns false to stop
+     * the script after logging out.
+     */
     public boolean bankForItems(int id, int amt){
         statusString = "Banking";
         General.println("Withdrawing food");
@@ -271,6 +304,9 @@ public class NinjaCows extends Script implements ActionListener, Painting, Mouse
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ** BEGIN SETTINGS METHODS ** ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ //
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ //
 
+    /**
+     * Sets up GUI for settings window and establishes ActionListeners for interactive components.
+     */
     private void startSettings(){
 
         settingsFrame = new JFrame("\"Ninja Cows\" Setup");
@@ -355,6 +391,10 @@ public class NinjaCows extends Script implements ActionListener, Painting, Mouse
 
     }
 
+    /**
+     * Handles GUI interaction with components in the "Setup" window.
+     * @param e
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == startButton){
@@ -416,6 +456,11 @@ public class NinjaCows extends Script implements ActionListener, Painting, Mouse
     private static final long startTime = System.currentTimeMillis();
     private long timeRunSoFar;
 
+    /**
+     * Paint method
+     * Displays our image for the paint, and displays time ran and current status
+     * @param g
+     */
     @Override
     public void onPaint(Graphics g) {
 
@@ -439,8 +484,18 @@ public class NinjaCows extends Script implements ActionListener, Painting, Mouse
 
     }
 
+    /**
+     * For Hiding/Showing paint.
+     */
     private static final Rectangle Toggle_Paint = new Rectangle(470, 330, 20, 20);
 
+    /**
+     * Checks for a click inside the Rectangle "Toggle_Paint.
+     * If paint is currently set to show, this method will hide the paint, and vice versa.
+     * @param point
+     * @param i
+     * @param b
+     */
     public void mouseClicked(Point point, int i, boolean b) {
         if (Toggle_Paint.contains(point.getLocation())){
             if (shouldShowPaint){
@@ -471,6 +526,15 @@ public class NinjaCows extends Script implements ActionListener, Painting, Mouse
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ ** BEGIN HELPER METHODS ** ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ //
     // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ //
 
+    /**
+     * Checks if given tile (in this script it is the player) is in the cow pen.
+     *
+     * @param t
+     * Tile to check
+     *
+     * @return
+     * true if tile is in the area, false otherwise.
+     */
     public boolean isInCowPen(RSTile t){
         if (!cowArea.contains(t.getX(), t.getY()))
             return false;
@@ -478,6 +542,16 @@ public class NinjaCows extends Script implements ActionListener, Painting, Mouse
         return true;
     }
 
+    /**
+     * Handles the instance where the player is transferred to one of the "Bot Monitoring Worlds" (Worlds 385 and 386).
+     * If the player is in one of these worlds, several things happen:
+     *
+     * We open the "Friends" tab to seem human (checking if we really switched worlds).
+     * We type a random message talking about the fact that we just
+     * changed worlds, then we hop back to a normal world.
+     *
+     * This is very important in anti-ban compliance, especially in a highly monitored area like lumbridge cows.
+     */
     public void handleBotWorlds(){
         if(Game.getCurrentWorld() == 385 || Game.getCurrentWorld() == 386){
             // Open friends tab to seem like we are checking world
