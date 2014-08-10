@@ -408,6 +408,7 @@ public class NinjaSpiders extends Script implements ActionListener /**implements
      * Banks for any reason (Usually food)
      */
     public void bank(){
+        //TODO
         scriptState = -1;
     }
 
